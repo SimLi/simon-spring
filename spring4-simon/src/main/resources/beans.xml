@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="beforeAdvice" class="com.devfuns.spring.aop.advice.BeforeAdviceWait"/>
+    <bean id="afterAdvice" class="com.devfuns.spring.aop.advice.AfterAdviceWait" />
+    <bean id="methodInter" class="com.devfuns.spring.aop.advice.MethodInterceptorAdvice"/>
+    <bean id="wait" class="com.devfuns.spring.aop.advice.NavieWaiterImpl"/>
+
+    <!--p:interceptorNames="beforeAdvice,afterAdvice"-->
+    <!--interceptorNames属性，接收的是String[] 类型的参数，可以用idref的形式配置，这样IDEA在，编辑配置文件的时候，IDEA就能
+    及时发现错误，并给出警告，当然也可以用  p:interceptorNames="beforeAdvice,afterAdvice" 的简化形式配置-->
+    <bean id="waitProxy" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:target-ref="wait" p:interceptorNames="beforeAdvice,afterAdvice"
+          p:interfaces="com.devfuns.spring.aop.advice.Waiter" >
+        <!--<property name="interceptorNames" >-->
+            <!--<list>-->
+                <!--<idref bean="beforeAdvice" />-->
+                <!--<idref bean="afterAdvice" />-->
+            <!--</list>-->
+        <!--</property>-->
+    </bean>
+
+    <bean id="waitInterProxy" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:target-ref="wait" p:interceptorNames="methodInter"
+          p:interfaces="com.devfuns.spring.aop.advice.Waiter" >
+        <!--<property name="interceptorNames" >-->
+        <!--<list>-->
+        <!--<idref bean="beforeAdvice" />-->
+        <!--<idref bean="afterAdvice" />-->
+        <!--</list>-->
+        <!--</property>-->
+    </bean>
+</beans>
+
