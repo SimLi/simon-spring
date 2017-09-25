@@ -7,6 +7,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.testng.annotations.Test;
 
+import java.sql.SQLException;
+
 public class BeforeAdviceTest {
 
     @Test
@@ -70,6 +72,33 @@ public class BeforeAdviceTest {
         Waiter proxBeanAdvice = (Waiter) context.getBean("waitInterProxy");
         proxBeanAdvice.serverTo("Simon");
         proxBeanAdvice.greetTo("Li");
+    }
+
+    @Test
+    public void testThrowAdviceBeans() {
+        String path = "beans.xml";
+        ApplicationContext context = new ClassPathXmlApplicationContext(path);
+        Waiter throwWait = (Waiter)context.getBean("throwWaitProxy");
+        try {
+            throwWait.save("Simon");
+        } catch (SQLException e) {
+            //e.printStackTrace();
+            System.out.println(" 获取异常" + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testIntroduceAdviceWait () {
+        String path = "beans.xml";
+        ApplicationContext context = new ClassPathXmlApplicationContext(path);
+        Waiter waiter = (Waiter)context.getBean("introduceAdviceWait");
+        waiter.greetTo("Simon"); // 未开启性能监控
+
+        System.out.println("-------------------------------------");
+        IntroduceAdvice introduceWait = (IntroduceAdvice)waiter;
+        introduceWait.setMonitorStatus(true);
+
+        waiter.greetTo("Simon"); // 开启引介增强
     }
 
 }

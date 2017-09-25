@@ -5,6 +5,7 @@
     <bean id="beforeAdvice" class="com.devfuns.spring.aop.advice.BeforeAdviceWait"/>
     <bean id="afterAdvice" class="com.devfuns.spring.aop.advice.AfterAdviceWait" />
     <bean id="methodInter" class="com.devfuns.spring.aop.advice.MethodInterceptorAdvice"/>
+    <bean id="throwAdvice" class="com.devfuns.spring.aop.advice.TransactionThrowAdvice" />
     <bean id="wait" class="com.devfuns.spring.aop.advice.NavieWaiterImpl"/>
 
     <!--p:interceptorNames="beforeAdvice,afterAdvice"-->
@@ -21,6 +22,7 @@
         <!--</property>-->
     </bean>
 
+     <!--环绕增强-->
     <bean id="waitInterProxy" class="org.springframework.aop.framework.ProxyFactoryBean"
           p:target-ref="wait" p:interceptorNames="methodInter"
           p:interfaces="com.devfuns.spring.aop.advice.Waiter" >
@@ -31,5 +33,18 @@
         <!--</list>-->
         <!--</property>-->
     </bean>
+
+    <!--// 异常增强-->
+    <bean id="throwWaitProxy" class="org.springframework.aop.framework.ProxyFactoryBean"
+        p:target-ref="wait" p:interceptorNames="throwAdvice"
+          p:proxyTargetClass="true">
+    </bean>
+
+
+    <!--引介增强-->
+    <bean id="introduceAdvice" class="com.devfuns.spring.aop.advice.IntroduceAdviceImpl" />
+    <bean id="introduceAdviceWait" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interfaces="com.devfuns.spring.aop.advice.IntroduceAdvice" p:proxyTargetClass="true"
+          p:target-ref="wait" p:interceptorNames="introduceAdvice" />
 </beans>
 
