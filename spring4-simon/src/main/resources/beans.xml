@@ -46,5 +46,50 @@
     <bean id="introduceAdviceWait" class="org.springframework.aop.framework.ProxyFactoryBean"
           p:interfaces="com.devfuns.spring.aop.advice.IntroduceAdvice" p:proxyTargetClass="true"
           p:target-ref="wait" p:interceptorNames="introduceAdvice" />
+
+
+    <!--切面部分的增强-->
+    <bean id="beforeAdviceAdvisor" class="com.devfuns.spring.aop.advisor.BeforeAdviceAdvisor" />
+
+    <!--定义一个切面，切面中注入增强beforeAdviceAdvisor   p:advice-ref -->
+    <bean id="staticAdvisor" class="com.devfuns.spring.aop.advisor.StaticMethodPointCutAdvisor"
+          p:advice-ref="beforeAdviceAdvisor" />
+
+    <!--wait的另一个实现，由于staticAdvisor切面中，只实现了对方法的判断，所以切面只会对方法过滤，而不会对类进行过滤，此处
+    验证！！ -->
+    <bean id="saller" class="com.devfuns.spring.aop.advisor.Saller" />
+
+    <!--定义一个AOP代理，interceptorNames使用定义的静态切面staticAdvisor-->
+    <bean id="staticAdvisorProxy" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interceptorNames="staticAdvisor" p:target-ref="wait" p:proxyTargetClass="true" />
+
+    <bean id="staticAdvisorSallerProxy" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interceptorNames="staticAdvisor" p:target-ref="saller" p:proxyTargetClass="true" />
+
+    <!--正则表达式切面-->
+    <bean id="regAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor"
+          p:advice-ref="beforeAdviceAdvisor">
+        <property name="patterns">
+            <list>
+                <value>.*To.*</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--正则表达式的切面代理-->
+    <bean id="regexAdvisorProxy" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interceptorNames="regAdvisor" p:target-ref="wait" p:proxyTargetClass="true" />
+
+    <!--动态切面-->
+    <bean id="dynamicAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice" ref="beforeAdviceAdvisor"></property>
+        <property name="pointcut">
+            <bean class="com.devfuns.spring.aop.advisor.DynamicAdvisor"></bean>
+        </property>
+    </bean>
+
+    <!--动态切面代理-->
+    <bean id="dynamicAdvisorProxy" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interceptorNames="dynamicAdvisor" p:target-ref="wait" p:proxyTargetClass="true"/>
 </beans>
 
